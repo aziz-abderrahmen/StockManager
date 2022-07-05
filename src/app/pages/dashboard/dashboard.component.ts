@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { LocationStrategy, PlatformLocation, Location } from '@angular/common';
 import { LegendItem, ChartType } from '../../features/lbd/lbd-chart/lbd-chart.component';
 import * as Chartist from 'chartist';
+import { ProductsService } from 'app/services/products.service';
+import {ListproductsComponent } from 'app/pages/list-products/list-products.component'
 
 @Component({
   selector: 'app-dashboard',
@@ -9,12 +11,12 @@ import * as Chartist from 'chartist';
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
+
     public emailChartType: ChartType;
     public emailChartData: any;
     public emailChartLegendItems: LegendItem[];
 
     public hoursChartType: ChartType;
-    public hoursChartData: any;
     public hoursChartOptions: any;
     public hoursChartResponsive: any[];
     public hoursChartLegendItems: LegendItem[];
@@ -24,32 +26,33 @@ export class DashboardComponent implements OnInit {
     public activityChartOptions: any;
     public activityChartResponsive: any[];
     public activityChartLegendItems: LegendItem[];
-  constructor() { }
+    
+    public PoissonsQuantity;
+    public CrustacesQuantity;
+    public CoquillagesQuantity;
+    products;
+    categories = [
+      { "id": 1, "category": 0,"name":"poissons", "products": null  },
+      { "id": 2, "category": 1,"name":"coquillages", "products": null },
+      { "id": 3, "category": 2, "name":"crustaces","products": null },
+    ];
+    public transactions :any;
+
+  constructor(public productsService: ProductsService) {
+    this.products=[]
+  }
 
   ngOnInit() {
       this.emailChartType = ChartType.Pie;
-      this.emailChartData = {
-        labels: ['62%', '32%', '6%'],
-        series: [62, 32, 6]
-      };
       this.emailChartLegendItems = [
-        { title: 'Open', imageClass: 'fa fa-circle text-info' },
-        { title: 'Bounce', imageClass: 'fa fa-circle text-danger' },
-        { title: 'Unsubscribe', imageClass: 'fa fa-circle text-warning' }
+        { title: 'Poissons', imageClass: 'fa fa-circle text-info' },
+        { title: 'Coquillages', imageClass: 'fa fa-circle text-warning' },
+        { title: 'Crustacés', imageClass: 'fa fa-circle text-danger' }
       ];
-
       this.hoursChartType = ChartType.Line;
-      this.hoursChartData = {
-        labels: ['9:00AM', '12:00AM', '3:00PM', '6:00PM', '9:00PM', '12:00PM', '3:00AM', '6:00AM'],
-        series: [
-          [287, 385, 490, 492, 554, 586, 698, 695, 752, 788, 846, 944],
-          [67, 152, 143, 240, 287, 335, 435, 437, 539, 542, 544, 647],
-          [23, 113, 67, 108, 190, 239, 307, 308, 439, 410, 410, 509]
-        ]
-      };
       this.hoursChartOptions = {
-        low: 0,
-        high: 800,
+        low: -20,
+        high: 100,
         showArea: true,
         height: '245px',
         axisX: {
@@ -58,8 +61,8 @@ export class DashboardComponent implements OnInit {
         lineSmooth: Chartist.Interpolation.simple({
           divisor: 3
         }),
-        showLine: false,
-        showPoint: false,
+        showLine: true,
+        showPoint: true,
       };
       this.hoursChartResponsive = [
         ['screen and (max-width: 640px)', {
@@ -71,19 +74,11 @@ export class DashboardComponent implements OnInit {
         }]
       ];
       this.hoursChartLegendItems = [
-        { title: 'Open', imageClass: 'fa fa-circle text-info' },
-        { title: 'Click', imageClass: 'fa fa-circle text-danger' },
-        { title: 'Click Second Time', imageClass: 'fa fa-circle text-warning' }
+        { title: 'Chiffre daffaires', imageClass: 'fa fa-circle text-info' },
+        { title: 'Marge', imageClass: 'fa fa-circle text-warning' },
+        { title: 'Cout', imageClass: 'fa fa-circle text-danger' }
       ];
-
       this.activityChartType = ChartType.Bar;
-      this.activityChartData = {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-        series: [
-          [542, 443, 320, 780, 553, 453, 326, 434, 568, 610, 756, 895],
-          [412, 243, 280, 580, 453, 353, 300, 364, 368, 410, 636, 695]
-        ]
-      };
       this.activityChartOptions = {
         seriesBarDistance: 10,
         axisX: {
@@ -102,11 +97,144 @@ export class DashboardComponent implements OnInit {
         }]
       ];
       this.activityChartLegendItems = [
-        { title: 'Tesla Model S', imageClass: 'fa fa-circle text-info' },
-        { title: 'BMW 5 Series', imageClass: 'fa fa-circle text-danger' }
+        { title: 'Poissons', imageClass: 'fa fa-circle text-info' },
+        { title: 'Coquillages', imageClass: 'fa fa-circle text-danger' },
+        { title: 'Crustaces', imageClass: 'fa fa-circle text-warning' }
       ];
-
-
+      this.getProducts();
+      this.getTransaction();
+      this.getTotalQuantityByCategory();
+      this.getTotalSalesByCategory()
     }
-
+    getTransaction() {
+      this.productsService.getTransaction().subscribe(res => {
+        this.transactions = res;
+      },
+        (err) => {
+          alert('failed loading json data');
+        });
+    }
+    getchiffreAffaires(){
+      let labels = [];
+      let CA = [];
+      let Cout = [];
+      let Marge = [];
+      let chiffreAffaires = 0
+      let today = new Date();
+      let todayYear = today.getFullYear();
+      for (let i = 0; i < this.transactions.length; i++) {
+        let dateExist = false
+        let date = new Date(this.transactions[i].created)
+        let transacYear = date.getFullYear();
+        let transacMonth = date.toLocaleString('default', { month: 'long' })
+        if (this.transactions[i].type == "Sale") {
+          if (transacYear == todayYear) {
+            chiffreAffaires = chiffreAffaires + this.transactions[i].price
+            for (let j = 0; j < labels.length; j++) {
+              if (labels[j] == transacMonth) {
+                CA[j] = CA[j] + this.transactions[i].price
+                Marge[j] = Marge[j] + this.transactions[i].price
+                dateExist = true;
+              }
+            }
+            if (dateExist == false) {
+              Cout[Cout.length] = 0
+              CA[CA.length] = this.transactions[i].price;
+              labels[labels.length] = transacMonth;
+              Marge[Marge.length] = this.transactions[i].price
+            }
+          }
+        }
+        else if (this.transactions[i].type == "Purchase"){
+          if (transacYear == todayYear) {
+            for (let j = 0; j < labels.length; j++) {
+              if (labels[j] == transacMonth) {
+                Cout[j] = Cout[j] + this.transactions[i].price
+                Marge[j] = Marge[j] - this.transactions[i].price
+                dateExist = true;
+              }
+            }
+            if (dateExist == false) {
+              CA[CA.length] = 0
+              Cout[Cout.length] = this.transactions[i].price;
+              labels[labels.length] = transacMonth;
+              Marge[Marge.length] = (0 - this.transactions[i].price)
+            }
+          }
+        }
+      }
+      return {
+        labels : labels,
+        series : [CA,Marge,Cout]
+      }
+    }
+    getProductsAll() {
+      for (let i = 0; i < this.categories.length; i++){
+        this.getProductsCategory(this.categories[i].category);
+      }
+    }
+  
+    getProductsCategory(cat) {
+      this.productsService.getProductCategories(cat).subscribe(res => {
+        for (let i = 0; i < this.categories.length; i++)
+          if (this.categories[i].category == cat) {
+            this.categories[i].products = res;
+          }
+      },
+        (err) => {
+          alert('failed loading json data');
+        });
+    }
+    getProducts() {
+      this.productsService.getProducts().subscribe(res => {
+        this.products = res;
+      },
+        (err) => {
+          alert('failed loading json data');
+        });
+    }
+    getTotalQuantityByCategory(){
+      let res =[]
+      let poissonQuantity=0
+      let coquillageQuantity=0
+      let crustacesQuantity=0
+      for (let i = 0; i < this.products.length; i++) 
+        if (this.products[i].category ==0)
+          poissonQuantity+=this.products[i].quantityInStock;
+        else if (this.products[i].category ==1)
+          coquillageQuantity+=this.products[i].quantityInStock;
+        else
+        crustacesQuantity+=this.products[i].quantityInStock;
+      let total = poissonQuantity+coquillageQuantity+crustacesQuantity
+      let poisson = ((poissonQuantity/total)*100).toFixed(2);
+      let coquillage = ((coquillageQuantity/total)*100).toFixed(2)
+      let crustaces = ((crustacesQuantity/total)*100).toFixed(2)
+      
+      return {
+        labels :[poisson.toString()+'%',coquillage.toString()+'%',crustaces.toString()+'%'],
+        series :[poisson,coquillage,crustaces]
+      }
+    }
+    getTotalSalesByCategory(){
+      let res =[]
+      let poissonSales=0
+      let coquillagesSales=0
+      let crustacesSales=0
+      for (let i = 0; i < this.products.length; i++) 
+        if (this.products[i].category ==0)
+          poissonSales+=this.products[i].nombre_produit_vendu;
+        else if (this.products[i].category ==1)
+          coquillagesSales+=this.products[i].nombre_produit_vendu;
+        else
+        crustacesSales+=this.products[i].nombre_produit_vendu;
+      let total = poissonSales+coquillagesSales+crustacesSales
+      let poisson = ((poissonSales/total)*100).toFixed(2);
+      let coquillage = ((coquillagesSales/total)*100).toFixed(2)
+      let crustaces = ((crustacesSales/total)*100).toFixed(2)
+      
+      return {
+        labels :['Nombre de produits vendus'],
+        series :[[poissonSales],[coquillagesSales],[crustacesSales]]
+      }
+    }
 }

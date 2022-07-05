@@ -7,8 +7,10 @@
     width: 260px;
     display: block;
     z-index: 5;
-    color: #fff;
+    color: white;
     font-weight: 200;
+    font-weight: $font-weight-normal;
+    line-height: 30px;
     background-size: cover;
     background-position: center center;
 
@@ -25,6 +27,7 @@
         .dropdown .dropdown-backdrop{
             display: none !important;
         }
+        background-color: rgb(50, 82, 136);
     }
 
     .sidebar-background{
@@ -45,10 +48,10 @@
 
         p{
             float: left;
-            font-size: 20px;
+            font-size: 30px;
             margin: 10px 10px;
-            color: $white-color;
-            line-height: 20px;
+            color: rgb(231, 237, 238);
+            line-height: 30px;
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
         }
 
@@ -70,7 +73,7 @@
         margin-right: 10px;
 
         img{
-            width: 35px;
+            width: 25px;
             top: 11px;
             position: absolute;
         }
@@ -112,7 +115,7 @@
             &.active > a{
                 color: #FFFFFF;
                 opacity: 1;
-                background: rgba(255,255,255,0.23);
+                background: rgb(144, 170, 203);
 
             }
 
@@ -157,47 +160,6 @@
             right: 30px;
         }
     }
-
-    .logo{
-        padding: $navbar-padding-a;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-
-        p{
-            float: left;
-            font-size: 20px;
-            margin: 10px 10px;
-            color: $white-color;
-            line-height: 20px;
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        }
-
-        .simple-text{
-            text-transform: uppercase;
-            padding: 5px 0px 5px 15px;
-            display: block;
-            font-size: $font-size-large;
-            color: $white-color;
-            text-align: left;
-            font-weight: $font-weight-normal;
-            line-height: 30px;
-        }
-    }
-
-    .logo-tim{
-        border-radius: 50%;
-        border: 1px solid #333;
-        display: block;
-        height: 61px;
-        width: 61px;
-        float: left;
-        overflow: hidden;
-
-        img{
-            width: 60px;
-            height: 60px;
-        }
-    }
-
     &:after,
     &:before{
         display: block;
@@ -216,7 +178,7 @@
     }
 
     &:after{
-       @include icon-gradient($black-color-top, $black-color-bottom);
+      
        z-index: 3;
        opacity: 1;
     }
@@ -225,30 +187,10 @@
     &.has-image:after{
         opacity: .77;
     }
-
-    &[data-color="blue"]:after{
-        @include icon-gradient($new-dark-blue, $blue-color-bottom);
-    }
-    &[data-color="azure"]:after{
-        @include icon-gradient($new-blue, $azure-color-bottom);
-    }
-    &[data-color="green"]:after{
-        @include icon-gradient($new-green, $green-color-bottom);
-    }
-    &[data-color="orange"]:after{
-        @include icon-gradient($new-orange, $orange-color-bottom);
-    }
-    &[data-color="red"]:after{
-        @include icon-gradient($new-red, $red-color-bottom);
-    }
-    &[data-color="purple"]:after{
-        @include icon-gradient($new-purple, $purple-color-bottom);
-    }
 }
 
-
 .main-panel{
-    background: rgba(203,203,210,.15);
+    background: rgb(250, 237, 198);
     position: relative;
     z-index: 2;
     float: right;
@@ -266,7 +208,7 @@
     }
 
     .navbar{
-        margin-bottom: 0;
+        margin-bottom: auto;
     }
 }
 

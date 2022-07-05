@@ -7,16 +7,13 @@ import { ProductsService } from '../../services/products.service';
   styleUrls: ['./list-products.component.css']
 })
 export class ListproductsComponent implements OnInit {
-    productsPoisson;
-    productsCrustaces;
-    productsCoquillages;
     newQuantity;
     newPromotion;
     prixTransaction;
     categories = [
-      { "id": 1, "name": "poissons", "products": null  },
-      { "id": 2, "name": "crustaces", "products": null },
-      { "id": 3, "name": "coquillages", "products": null },
+      { "id": 1, "category": 0, "products": null  },
+      { "id": 2, "category": 1, "products": null },
+      { "id": 3, "category": 2, "products": null },
     ];
     poissons:boolean = true;
     crustaces: boolean=true;
@@ -29,19 +26,19 @@ export class ListproductsComponent implements OnInit {
     this.newQuantity = [];
     this.newPromotion = [];
     this.prixTransaction = [];
+  
     this.getProductsAll();
   }
   getProductsAll() {
     for (let i = 0; i < this.categories.length; i++){
-      this.getProductsCategory(this.categories[i].name);
-      console.log(this.categories[i].products)
+      this.getProductsCategory(this.categories[i].category);
     }
   }
 
-  getProductsCategory(category) {
-    this.productsService.getProductCategories(category).subscribe(res => {
+  getProductsCategory(cat) {
+    this.productsService.getProductCategories(cat).subscribe(res => {
       for (let i = 0; i < this.categories.length; i++)
-        if (this.categories[i].name == category) {
+        if (this.categories[i].category == cat) {
           this.categories[i].products = res;
         }
     },
@@ -56,7 +53,7 @@ export class ListproductsComponent implements OnInit {
         this.productsService.setPromotion(tig_id, this.newPromotion[tig_id]).subscribe(res => {
           res;
         },
-          (err) => {
+          (err) => { 
             alert('failed loading json data');
           });
       }
@@ -85,18 +82,18 @@ export class ListproductsComponent implements OnInit {
   removeQuantity() {
     for (let tig_id = 0; tig_id < this.newQuantity.length; tig_id++) {
       if (this.newQuantity[tig_id]) {
-        if (this.prixTransaction[tig_id]) {
-          if (this.prixTransaction[tig_id] = 0){
-            console.log('OK');
-            this.addTransaction(tig_id, "Unsold");}
-          else
-            this.addTransaction(tig_id, "Sale")
+        if (this.prixTransaction[tig_id] != undefined) {
           this.productsService.removeQuantity(tig_id, this.newQuantity[tig_id]).subscribe(res => {
             res;
           },
             (err) => {
               alert(err + 'failed loading json data');
             });
+          if (this.prixTransaction[tig_id] = 0){
+            this.addTransaction(tig_id, "Unsold");}
+          else
+            this.addTransaction(tig_id, "Sale")
+          
         }
       }
     }

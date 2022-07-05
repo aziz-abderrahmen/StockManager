@@ -1,0 +1,55 @@
+body,
+h1, .h1, 
+p, 
+.navbar, 
+.brand, 
+.btn-simple,
+a, 
+.td-name, 
+td,
+button.close{
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    font-family: "Roboto","Helvetica Neue",Arial,sans-serif;
+    font-weight: $font-weight-normal;
+}
+h1{
+    font-weight: $font-weight-light;
+    margin: $margin-large-vertical 0 $margin-base-vertical;
+}
+h1{
+    font-size: $font-size-h1;
+}
+p{
+    font-size: $font-paragraph;
+    line-height: $line-height-general;
+}
+h1 .subtitle{
+    display: block;
+    margin: 0 0 $margin-large-vertical;   
+}
+.text-primary, .text-primary:hover{
+    color: #1D62F0 !important;
+}
+.text-info, .text-info:hover{
+    color: $info-color !important;
+}
+.text-success, .text-success:hover{
+    color: $success-color !important;
+}
+.text-warning, .text-warning:hover{
+    color: $warning-color !important;
+}
+.text-danger, .text-danger:hover{
+    color: $danger-color !important;
+}
+.text-yellow, .text-yellow:hover{
+    color: #FFEBA1 !important;
+}
+.text-r, .text-r:hover{
+    color: #FD6F96 !important;
+}
+.text-g, .text-g:hover{
+    color:#95DAC1 !important;
+}
+
